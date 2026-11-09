@@ -8,7 +8,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.freedesktop.dbus.Variant
 import org.freedesktop.dbus.annotations.DBusBoundProperty
 import org.freedesktop.dbus.annotations.DBusInterfaceName
 import org.freedesktop.dbus.annotations.DBusMemberName
@@ -16,6 +15,7 @@ import org.freedesktop.dbus.connections.impl.DBusConnection
 import org.freedesktop.dbus.connections.impl.DBusConnectionBuilder
 import org.freedesktop.dbus.interfaces.DBusInterface
 import org.freedesktop.dbus.interfaces.Properties
+import org.freedesktop.dbus.types.Variant
 
 /** MPRIS root interface: identity, capabilities, raise/quit. */
 @DBusInterfaceName("org.mpris.MediaPlayer2")
@@ -108,7 +108,7 @@ interface MprisPlayer : DBusInterface {
 
 /** One exported object serving both MPRIS interfaces at a single object path. */
 private class MprisObject(private val controller: PlayerController) : MprisRoot, MprisPlayer {
-    override fun getObjectPath(): String = PATH
+    override fun getObjectPath(): String = MprisService.PATH
 
     // Window management is out of scope for the desktop MVP.
     override fun raise() {}
