@@ -41,7 +41,7 @@ jobs:
           cache-cleanup: on-success
 
       - name: Install AppImage build tools
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq squashfs-tools desktop-file-utils
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq squashfs-tools desktop-file-utils xvfb
 
       # Phase 3a/3b: mpv CLI decodes 5s of a real stream (--ao=null), and
       # MpvLibraryTest drives the same decode path through libmpv + JNA.
@@ -72,12 +72,20 @@ jobs:
       - name: Assemble AppImage
         run: ./packaging/appimage.sh
 
-      - name: Smoke test (extract and inspect the AppImage)
+      - name: Smoke test (extract, inspect and launch the AppImage)
         run: |
           ./build/appimage/Metrolist-x86_64.AppImage --appimage-extract
           test -x squashfs-root/AppRun
           test -f squashfs-root/usr/lib/metrolist.jar
           squashfs-root/usr/lib/jre/bin/java -version
+          # The Compose window must come up and stay up: 124 = still alive
+          # when the timeout hit, anything else = crashed during startup.
+          set +e
+          timeout 20 xvfb-run -a ./squashfs-root/AppRun
+          code=$?
+          set -e
+          echo "window smoke exit=$code (expected 124)"
+          test "$code" -eq 124
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v7
