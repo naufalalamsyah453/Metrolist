@@ -28,3 +28,11 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.ktor.client.mock)
 }
+
+// Print test stdout (DIAG lines) straight into the CI log.
+tasks.withType<Test>().configureEach {
+    testLogging {
+        showStandardStreams = true
+        events("failed")
+    }
+}
