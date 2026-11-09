@@ -14,6 +14,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":shared"))
     // Desktop bundle (ui + foundation + animation + runtime) that also pulls
     // skiko-awt-runtime-linux-x64 — plain ui/foundation coordinates omit
     // libskiko-linux-x64.so and the app dies in SkiaLayer.<clinit>.

@@ -46,6 +46,19 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew packaging/appimage.sh
 
+      - name: Shared networking smoke test (real YouTube Music search)
+        run: ./gradlew --console=plain :shared:test --warning-mode summary
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: shared-test-reports
+          path: |
+            shared/build/reports/tests/
+            shared/build/test-results/
+          if-no-files-found: ignore
+
       - name: Build desktop uber jar
         run: ./gradlew --console=plain :desktopApp:packageUberJarForCurrentOS --warning-mode summary
 
