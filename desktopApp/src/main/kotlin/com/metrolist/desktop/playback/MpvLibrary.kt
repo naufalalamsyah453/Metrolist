@@ -22,6 +22,7 @@ interface MpvLibrary : Library {
     companion object {
         const val EVENT_NONE = 0
         const val EVENT_END_FILE = 7
+        const val END_FILE_REASON_EOF = 0
         const val END_FILE_REASON_ERROR = 4
     }
 }

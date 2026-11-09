@@ -26,6 +26,14 @@ dependencies {
     implementation("org.jetbrains.compose.material3:material3:${libs.versions.composeMaterial3.get()}")
 }
 
+// Print test stdout (DIAG lines) straight into the CI log.
+tasks.withType<Test>().configureEach {
+    testLogging {
+        showStandardStreams = true
+        events("failed")
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "com.metrolist.desktop.MainKt"
