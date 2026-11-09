@@ -78,6 +78,8 @@ jobs:
           test -x squashfs-root/AppRun
           test -f squashfs-root/usr/lib/metrolist.jar
           squashfs-root/usr/lib/jre/bin/java -version
+          # Packaged playback: bundled JRE + bundled libmpv must play 3s headless.
+          ./squashfs-root/AppRun --smoke
           # The Compose window must come up and stay up: 124 = still alive
           # when the timeout hit, anything else = crashed during startup.
           set +e

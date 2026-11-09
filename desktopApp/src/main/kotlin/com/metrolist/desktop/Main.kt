@@ -36,10 +36,21 @@ import com.metrolist.desktop.playback.PlayerController
 import com.metrolist.innertube.YouTube
 import com.metrolist.innertube.models.SongItem
 import com.metrolist.innertube.models.YouTubeLocale
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import java.util.Locale
+import kotlin.system.exitProcess
 
-fun main() = application {
+fun main(args: Array<String>) {
+    if ("--smoke" in args) {
+        exitProcess(runSmoke())
+    }
+    runUi()
+}
+
+private fun runUi() = application {
     initLocale()
     val controller = remember { PlayerController() }
     Window(
@@ -65,6 +76,35 @@ private fun initLocale() {
             hl = system.language.ifEmpty { "en" },
         )
 }
+
+/**
+ * Headless health check (`--smoke`) for CI and packaging: resolve one real
+ * stream, play3s through libmpv and exit 0 only after a full load → play →
+ * EOF cycle. ao is forced to null because runners have no sound card.
+ */
+private fun runSmoke(): Int =
+    runBlocking {
+        initLocale()
+        val controller =
+            PlayerController(playerOptions = mapOf("ao" to "null", "vo" to "null", "length" to "3"))
+        try {
+            controller.play(
+                listOf(
+                    SongItem(id = "dQw4w9WgXcQ", title = "smoke", artists = emptyList(), thumbnail = ""),
+                ),
+                0,
+            )
+            withTimeout(60_000) { controller.isPlaying.first { it } }
+            withTimeout(60_000) { controller.isPlaying.first { !it } }
+            println("smoke: load -> play -> EOF OK")
+            0
+        } catch (t: Throwable) {
+            System.err.println("smoke failed: $t")
+            1
+        } finally {
+            controller.close()
+        }
+    }
 
 @Composable
 private fun PlayerScreen(controller: PlayerController) {

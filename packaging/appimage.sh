@@ -41,9 +41,37 @@ ln -sf metrolist.png "$APPDIR/.DirIcon"
 cat > "$APPDIR/AppRun" <<'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"
-exec "$HERE/usr/lib/jre/bin/java" -Xmx2g -jar "$HERE/usr/lib/metrolist.jar" "$@"
+export LD_LIBRARY_PATH="$HERE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "$HERE/usr/lib/jre/bin/java" -Xmx2g -Dmetrolist.mpv.library="$HERE/usr/lib/libmpv.so.2" -jar "$HERE/usr/lib/metrolist.jar" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"
+
+# --- bundle libmpv and its shared-library closure -----------------------------
+# Skips glibc core (present on every target system); everything else — ffmpeg,
+# libplacebo, … — is copied so playback works without a system mpv install.
+MPV_LIB="$(find /usr/lib /lib -name 'libmpv.so.2' -print -quit 2>/dev/null || true)"
+[ -n "$MPV_LIB" ] || { echo "libmpv.so.2 not found (apt install libmpv2)" >&2; exit 1; }
+
+worklist=("$MPV_LIB")
+seen=" "
+while [ "${#worklist[@]}" -gt 0 ]; do
+  so="${worklist[0]}"
+  worklist=("${worklist[@]:1}")
+  case "$seen" in *" $so "*) continue ;; esac
+  seen="$seen$so "
+  name="$(basename "$so")"
+  case "$name" in
+    libc.so*|libm.so*|libpthread*|libdl.so*|librt.so*|ld-linux*|libgcc_s.so*) continue ;;
+  esac
+  real="$(readlink -f "$so")"
+  if [ ! -e "$APPDIR/usr/lib/$name" ]; then
+    cp -L "$real" "$APPDIR/usr/lib/$name"
+    while read -r dep; do
+      [ -n "$dep" ] && [ -e "$dep" ] && worklist+=("$dep")
+    done < <(ldd "$real" 2>/dev/null | awk '{ for (i = 1; i <= NF; i++) if ($i == "=>") print $(i + 1) }')
+  fi
+done
+echo "Bundled $(ls "$APPDIR/usr/lib" | wc -l) native libraries alongside the JRE"
 
 cat > "$APPDIR/${APP}.desktop" <<'EOF'
 [Desktop Entry]
