@@ -27,7 +27,9 @@ class PlayerControllerTest {
                 controller.play(
                     listOf(
                         SongItem(id = "dQw4w9WgXcQ", title = "Never Gonna Give You Up", artists = emptyList(), thumbnail = ""),
-                        SongItem(id = "9bZkp7q19f0", title = "Gangnam Style", artists = emptyList(), thumbnail = ""),
+                        // Same proven video: the assertion is about queue advance,
+                        // and other popular IDs report "unavailable" from CI IPs.
+                        SongItem(id = "dQw4w9WgXcQ", title = "Never Gonna Give You Up (2)", artists = emptyList(), thumbnail = ""),
                     ),
                     0,
                 )
