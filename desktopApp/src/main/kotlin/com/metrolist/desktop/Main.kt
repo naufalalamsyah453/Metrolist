@@ -111,10 +111,11 @@ private fun PlayerScreen(controller: PlayerController) {
                         scope.launch {
                             results =
                                 YouTube.search(q, YouTube.SearchFilter.FILTER_SONG)
-                                    .getOrElse {
-                                        System.err.println("search failed: $it")
-                                        emptyList()
-                                    }.filterIsInstance<SongItem>()
+                                    .onFailure { System.err.println("search failed: $it") }
+                                    .getOrNull()
+                                    ?.items
+                                    ?.filterIsInstance<SongItem>()
+                                    ?: emptyList()
                             searching = false
                         }
                     },
