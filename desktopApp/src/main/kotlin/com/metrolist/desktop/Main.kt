@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.metrolist.desktop.mpris.MprisService
 import com.metrolist.desktop.playback.PlayerController
 import com.metrolist.innertube.YouTube
 import com.metrolist.innertube.models.SongItem
@@ -53,8 +54,11 @@ fun main(args: Array<String>) {
 private fun runUi() = application {
     initLocale()
     val controller = remember { PlayerController() }
+    // Media keys / desktop shell integration; null when no session bus (CI).
+    val mpris = remember { MprisService.start(controller) }
     Window(
         onCloseRequest = {
+            mpris?.close()
             controller.close()
             exitApplication()
         },

@@ -16,6 +16,9 @@ kotlin {
 dependencies {
     implementation(project(":shared"))
     implementation(libs.jna)
+    // MPRIS media-key/shell integration over the session bus.
+    implementation(libs.dbus.java.core)
+    implementation(libs.dbus.java.transport)
     testImplementation(libs.junit)
     // Desktop bundle (ui + foundation + animation + runtime) that also pulls
     // skiko-awt-runtime-linux-x64 — plain ui/foundation coordinates omit
