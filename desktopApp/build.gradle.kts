@@ -14,9 +14,11 @@ kotlin {
 }
 
 dependencies {
-    implementation("org.jetbrains.compose.runtime:runtime:$composeMp")
-    implementation("org.jetbrains.compose.foundation:foundation:$composeMp")
-    implementation("org.jetbrains.compose.ui:ui:$composeMp")
+    // Desktop bundle (ui + foundation + animation + runtime) that also pulls
+    // skiko-awt-runtime-linux-x64 — plain ui/foundation coordinates omit
+    // libskiko-linux-x64.so and the app dies in SkiaLayer.<clinit>.
+    // Pinned to linux-x64 because the shipped artifact is an x86_64 AppImage.
+    implementation("org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeMp")
     implementation("org.jetbrains.compose.components:components-resources:$composeMp")
     implementation("org.jetbrains.compose.material3:material3:${libs.versions.composeMaterial3.get()}")
 }
