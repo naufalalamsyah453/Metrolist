@@ -4,6 +4,7 @@ import com.metrolist.desktop.playback.PlayerController
 import org.freedesktop.dbus.connections.BusAddress
 import org.freedesktop.dbus.connections.impl.DBusConnectionBuilder
 import org.freedesktop.dbus.connections.transports.TransportBuilder
+import org.freedesktop.dbus.messages.DBusSignal
 import org.freedesktop.dbus.bin.EmbeddedDBusDaemon
 import org.freedesktop.dbus.interfaces.Properties
 import org.freedesktop.dbus.matchrules.DBusMatchRuleBuilder
@@ -45,7 +46,7 @@ class MprisServiceTest {
 
                         val changed = CountDownLatch(1)
                         var pushedStatus: String? = null
-                        clientConn.addSigHandler(
+                        clientConn.addSigHandler<DBusSignal>(
                             DBusMatchRuleBuilder.create().withInterface("org.freedesktop.DBus.Properties").build(),
                         ) { signal ->
                             if (signal is Properties.PropertiesChanged && signal.path == MprisService.PATH) {
