@@ -1,4 +1,4 @@
-import com.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     alias(libs.plugins.compose.multiplatform)
@@ -7,16 +7,18 @@ plugins {
     kotlin("jvm")
 }
 
+val composeMp = libs.versions.composeMultiplatform.get()
+
 kotlin {
     jvmToolchain(21)
 }
 
 dependencies {
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.material3)
-    implementation(compose.ui)
-    implementation(compose.components.resources)
+    implementation("org.jetbrains.compose.runtime:runtime:$composeMp")
+    implementation("org.jetbrains.compose.foundation:foundation:$composeMp")
+    implementation("org.jetbrains.compose.ui:ui:$composeMp")
+    implementation("org.jetbrains.compose.components:components-resources:$composeMp")
+    implementation("org.jetbrains.compose.material3:material3:${libs.versions.composeMaterial3.get()}")
 }
 
 compose.desktop {

@@ -7,6 +7,8 @@ json = "20260814"
 kotlin = "2.4.20"
 compose = "1.12.1"
 composeMultiplatform = "1.12.1"
+# Pinned by compose-gradle-plugin 1.12.1 (ComposeBuildConfig.composeMaterial3Version).
+composeMaterial3 = "1.9.0"
 lifecycle = "2.11.0"
 material3 = "1.5.0-alpha28"
 appcompat = "1.8.0"
