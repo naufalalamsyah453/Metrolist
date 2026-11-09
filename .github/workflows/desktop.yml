@@ -43,16 +43,16 @@ jobs:
       - name: Install AppImage build tools
         run: sudo apt-get update -qq && sudo apt-get install -y -qq squashfs-tools desktop-file-utils
 
-      # Phase 3a: mpv decodes 5s of a real stream with --ao=null in the shared
-      # test step (MpvPlaybackTest) — proves the playback decode path in CI.
-      - name: Install mpv (playback decode spike)
-        run: sudo apt-get install -y -qq mpv
+      # Phase 3a/3b: mpv CLI decodes 5s of a real stream (--ao=null), and
+      # MpvLibraryTest drives the same decode path through libmpv + JNA.
+      - name: Install mpv and libmpv (playback spikes)
+        run: sudo apt-get install -y -qq mpv libmpv2
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew packaging/appimage.sh
 
-      - name: Shared networking smoke test (real YouTube Music search)
-        run: ./gradlew --console=plain :shared:test --warning-mode summary
+      - name: Core tests (YouTube search, stream fetch, libmpv playback)
+        run: ./gradlew --console=plain :shared:test :desktopApp:test --warning-mode summary
 
       - name: Upload test reports
         if: failure()
@@ -62,6 +62,8 @@ jobs:
           path: |
             shared/build/reports/tests/
             shared/build/test-results/
+            desktopApp/build/reports/tests/
+            desktopApp/build/test-results/
           if-no-files-found: ignore
 
       - name: Build desktop uber jar
